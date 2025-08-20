@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { Progress } from "./ui/progress";
 import { Activity, AlertTriangle, CheckCircle, Gauge } from "lucide-react";
+import AnomalyDetection from './AnomalyDetection';
 
 // Mock data - 708 engines
 const generateEngineData = () => {
@@ -39,34 +40,34 @@ const rulDistribution = [
 
 // Operational conditions distribution
 const operationalConditions = [
-  { 
-    name: 'Standard Training', 
-    description: 'Sea-level single environment operation', 
-    count: 178, 
+  {
+    name: 'Standard Training',
+    description: 'Sea-level single environment operation',
+    count: 178,
     color: '#3b82f6',
     emoji: '🌊',
     riskLevel: 'Low'
   },
-  { 
-    name: 'Full Flight Envelope', 
-    description: 'Multi-altitude multi-speed environment', 
-    count: 177, 
+  {
+    name: 'Full Flight Envelope',
+    description: 'Multi-altitude multi-speed environment',
+    count: 177,
     color: '#10b981',
     emoji: '✈️',
     riskLevel: 'Medium'
   },
-  { 
-    name: 'Complex Training', 
-    description: 'Sea-level multi-fault mode', 
-    count: 176, 
+  {
+    name: 'Complex Training',
+    description: 'Sea-level multi-fault mode',
+    count: 176,
     color: '#f59e0b',
     emoji: '⚠️',
     riskLevel: 'High'
   },
-  { 
-    name: 'Severe Flight Conditions', 
-    description: 'Full envelope multi-fault risk', 
-    count: 177, 
+  {
+    name: 'Severe Flight Conditions',
+    description: 'Full envelope multi-fault risk',
+    count: 177,
     color: '#ef4444',
     emoji: '🚨',
     riskLevel: 'Critical'
@@ -183,57 +184,8 @@ export function Dashboard() {
 
       {/* First Row: Real-time Status Monitoring */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Left - Engine Health Status Grid (50%) */}
-        <Card className="w-full">
-          <CardHeader>
-            <CardTitle>Engine Health Status Grid</CardTitle>
-            <p className="text-sm text-muted-foreground">
-              Click engine tiles to view detailed information (showing first 240 engines)
-            </p>
-            {selectedEngine && (
-              <div className="mt-2">
-                <Badge variant="outline">
-                  Selected: Engine {selectedEngine} - RUL: {engines.find(e => e.id === selectedEngine)?.rul} cycles
-                </Badge>
-              </div>
-            )}
-          </CardHeader>
-          <CardContent className="w-full">
-            <div 
-              className="gap-1 max-h-96 overflow-y-auto w-full"
-              style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(16, 1fr)',
-                width: '100%'
-              }}
-            >
-              {engines.slice(0, 240).map((engine) => (
-                <div
-                  key={engine.id}
-                  className={`w-4 h-4 rounded-sm cursor-pointer hover:scale-110 transition-all duration-200 hover:ring-2 hover:ring-blue-500 ${getEngineColor(engine.status)} ${
-                    selectedEngine === engine.id ? 'ring-2 ring-blue-500 scale-110' : ''
-                  }`}
-                  title={`Engine ${engine.id}: RUL ${engine.rul} cycles`}
-                  onClick={() => handleEngineClick(engine.id)}
-                />
-              ))}
-            </div>
-            <div className="flex items-center gap-4 mt-4 text-xs">
-              <div className="flex items-center gap-1">
-                <div className="w-3 h-3 bg-green-500 rounded"></div>
-                <span>Healthy (RUL &gt; 60)</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <div className="w-3 h-3 bg-yellow-500 rounded"></div>
-                <span>Warning (15-60)</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <div className="w-3 h-3 bg-red-500 rounded"></div>
-                <span>Critical (&lt; 15)</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Left - Anomaly Detection (50%) */}
+        <AnomalyDetection />
 
         {/* Right - RUL Distribution Histogram (50%) */}
         <Card>
@@ -249,12 +201,12 @@ export function Dashboard() {
                 const percentage = (item.count / fleetStats.total) * 100;
                 const maxCount = Math.max(...rulDistribution.map(d => d.count));
                 const barHeight = (item.count / maxCount) * 200;
-                
+
                 return (
                   <div key={item.range} className="flex items-end gap-3">
                     <div className="w-16 text-sm text-muted-foreground">{item.range}</div>
                     <div className="flex-1">
-                      <div 
+                      <div
                         className={`${item.color} rounded-t`}
                         style={{ height: `${barHeight}px`, minHeight: '20px' }}
                       />
@@ -286,7 +238,7 @@ export function Dashboard() {
               {failureRiskData.map((period, index) => {
                 const criticalPct = (period.critical / period.total) * 100;
                 const warningPct = (period.warning / period.total) * 100;
-                
+
                 return (
                   <div key={period.period} className="space-y-2">
                     <div className="flex justify-between items-center">
@@ -294,11 +246,11 @@ export function Dashboard() {
                       <span className="text-sm text-muted-foreground">Total: {period.total} engines</span>
                     </div>
                     <div className="relative h-6 bg-gray-100 rounded overflow-hidden">
-                      <div 
+                      <div
                         className="absolute left-0 top-0 h-full bg-red-500"
                         style={{ width: `${criticalPct}%` }}
                       />
-                      <div 
+                      <div
                         className="absolute left-0 top-0 h-full bg-yellow-500"
                         style={{ left: `${criticalPct}%`, width: `${warningPct}%` }}
                       />
@@ -332,29 +284,29 @@ export function Dashboard() {
                     const percentage = condition.count / total;
                     const startAngle = operationalConditions.slice(0, index).reduce((sum, d) => sum + (d.count / total) * 360, 0);
                     const endAngle = startAngle + (percentage * 360);
-                    
+
                     // Calculate path for pie slice
                     const centerX = 64;
                     const centerY = 64;
                     const radius = 56;
-                    
+
                     const startAngleRad = (startAngle * Math.PI) / 180;
                     const endAngleRad = (endAngle * Math.PI) / 180;
-                    
+
                     const x1 = centerX + radius * Math.cos(startAngleRad);
                     const y1 = centerY + radius * Math.sin(startAngleRad);
                     const x2 = centerX + radius * Math.cos(endAngleRad);
                     const y2 = centerY + radius * Math.sin(endAngleRad);
-                    
+
                     const largeArcFlag = endAngle - startAngle > 180 ? 1 : 0;
-                    
+
                     const pathData = [
                       `M ${centerX} ${centerY}`,
                       `L ${x1} ${y1}`,
                       `A ${radius} ${radius} 0 ${largeArcFlag} 1 ${x2} ${y2}`,
                       'Z'
                     ].join(' ');
-                    
+
                     return (
                       <path
                         key={condition.name}
@@ -373,8 +325,8 @@ export function Dashboard() {
                 {operationalConditions.map((condition) => (
                   <div key={condition.name} className="flex items-center justify-between text-xs">
                     <div className="flex items-center gap-2">
-                      <div 
-                        className="w-3 h-3 rounded-full" 
+                      <div
+                        className="w-3 h-3 rounded-full"
                         style={{ backgroundColor: condition.color }}
                       />
                       <span className="font-medium">{condition.emoji} {condition.name}</span>
@@ -392,8 +344,8 @@ export function Dashboard() {
                       <strong className="flex items-center gap-1">
                         {condition.emoji} {condition.name}
                       </strong>
-                      <Badge 
-                        variant="outline" 
+                      <Badge
+                        variant="outline"
                         className={getRiskColor(condition.riskLevel)}
                       >
                         {condition.riskLevel} Risk
@@ -406,7 +358,7 @@ export function Dashboard() {
 
               <div className="mt-4 p-3 bg-blue-50 rounded-lg">
                 <p className="text-xs text-blue-800">
-                  <strong>Note:</strong> Different operational conditions present varying levels of degradation risk. 
+                  <strong>Note:</strong> Different operational conditions present varying levels of degradation risk.
                   Engines operating under severe flight conditions require more frequent monitoring and maintenance.
                 </p>
               </div>
