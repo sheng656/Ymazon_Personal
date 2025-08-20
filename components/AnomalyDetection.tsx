@@ -46,16 +46,40 @@ export function AnomalyDetection() {
       confidence: 0.68,
       description: 'Minor pressure fluctuation in combustion chamber'
     },
+    {
+      engineId: 'ENG-267',
+      anomalyType: 'vibration',
+      severity: 'medium',
+      detectedAt: '2025-08-20 10:15',
+      confidence: 0.82,
+      description: 'Unusual frequency pattern in compressor section'
+    },
+    {
+      engineId: 'ENG-155',
+      anomalyType: 'performance',
+      severity: 'low',
+      detectedAt: '2025-08-20 09:45',
+      confidence: 0.71,
+      description: 'Fuel consumption slightly above normal parameters'
+    },
+    {
+      engineId: 'ENG-203',
+      anomalyType: 'temperature',
+      severity: 'medium',
+      detectedAt: '2025-08-20 08:30',
+      confidence: 0.79,
+      description: 'Oil temperature trending upward beyond optimal range'
+    },
   ];
 
   const anomalyStats = {
-    total: 4,
+    total: 7,
     critical: 1,
     high: 1,
-    medium: 1,
-    low: 1,
-    resolved: 12,
-    avgConfidence: 0.82
+    medium: 3,
+    low: 2,
+    resolved: 15,
+    avgConfidence: 0.80
   };
 
   const getSeverityColor = (severity: string) => {
@@ -111,7 +135,7 @@ export function AnomalyDetection() {
         </div>
 
         {/* Active Anomalies List */}
-        <div className="space-y-2 max-h-60 overflow-y-auto">
+        <div className="space-y-2 max-h-80 overflow-y-auto">
           <h4 className="font-medium text-gray-700 mb-2">Active Anomalies</h4>
           {anomalies.map((anomaly, index) => (
             <div key={index} className="border rounded-lg p-3 hover:bg-gray-50 transition-colors">

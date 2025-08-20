@@ -182,91 +182,84 @@ export function Dashboard() {
         </Card>
       </div>
 
-      {/* First Row: Real-time Status Monitoring */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Left - Anomaly Detection (50%) */}
+      {/* Main Dashboard Row: Three Column Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Left - Anomaly Detection */}
         <AnomalyDetection />
 
-        {/* Right - RUL Distribution Histogram (50%) */}
+        {/* Center - RUL Analysis (Distribution + Risk Timeline) */}
         <Card>
           <CardHeader>
-            <CardTitle>RUL Distribution Histogram</CardTitle>
+            <CardTitle>RUL Analysis</CardTitle>
             <p className="text-sm text-muted-foreground">
-              Fleet health distribution overview
+              Fleet health distribution and failure risk timeline
             </p>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              {rulDistribution.map((item) => {
-                const percentage = (item.count / fleetStats.total) * 100;
-                const maxCount = Math.max(...rulDistribution.map(d => d.count));
-                const barHeight = (item.count / maxCount) * 200;
-
-                return (
-                  <div key={item.range} className="flex items-end gap-3">
-                    <div className="w-16 text-sm text-muted-foreground">{item.range}</div>
-                    <div className="flex-1">
-                      <div
-                        className={`${item.color} rounded-t`}
-                        style={{ height: `${barHeight}px`, minHeight: '20px' }}
-                      />
-                      <div className="flex justify-between text-xs mt-1">
-                        <span>{item.count} engines</span>
-                        <span>{percentage.toFixed(1)}%</span>
+            {/* RUL Distribution Histogram */}
+            <div className="mb-6">
+              <h4 className="font-medium text-gray-700 mb-3">Current RUL Distribution</h4>
+              <div className="space-y-3">
+                {rulDistribution.map((item) => {
+                  const percentage = (item.count / fleetStats.total) * 100;
+                  const maxCount = Math.max(...rulDistribution.map(d => d.count));
+                  const barHeight = (item.count / maxCount) * 80; // Reduced height for compact layout
+                  
+                  return (
+                    <div key={item.range} className="flex items-end gap-3">
+                      <div className="w-12 text-xs text-muted-foreground">{item.range}</div>
+                      <div className="flex-1">
+                        <div 
+                          className={`${item.color} rounded-t`}
+                          style={{ height: `${barHeight}px`, minHeight: '12px' }}
+                        />
+                        <div className="flex justify-between text-xs mt-1">
+                          <span>{item.count}</span>
+                          <span>{percentage.toFixed(1)}%</span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Failure Risk Timeline */}
+            <div>
+              <h4 className="font-medium text-gray-700 mb-3">Failure Risk Timeline</h4>
+              <div className="space-y-3">
+                {failureRiskData.map((period) => {
+                  const criticalPct = (period.critical / period.total) * 100;
+                  const warningPct = (period.warning / period.total) * 100;
+                  
+                  return (
+                    <div key={period.period} className="space-y-2">
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs font-medium">{period.period}</span>
+                        <span className="text-xs text-muted-foreground">{period.total} engines</span>
+                      </div>
+                      <div className="relative h-4 bg-gray-100 rounded overflow-hidden">
+                        <div 
+                          className="absolute left-0 top-0 h-full bg-red-500"
+                          style={{ width: `${criticalPct}%` }}
+                        />
+                        <div 
+                          className="absolute left-0 top-0 h-full bg-yellow-500"
+                          style={{ left: `${criticalPct}%`, width: `${warningPct}%` }}
+                        />
+                      </div>
+                      <div className="flex justify-between text-xs">
+                        <span className="text-red-600">Critical: {period.critical}</span>
+                        <span className="text-yellow-600">Warning: {period.warning}</span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </CardContent>
         </Card>
-      </div>
-
-      {/* Second Row: Predictive Analysis */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left - Failure Risk Timeline (60%) */}
-        <Card className="lg:col-span-2">
-          <CardHeader>
-            <CardTitle>Failure Risk Timeline</CardTitle>
-            <p className="text-sm text-muted-foreground">
-              Predicted failure engine count in next 60 cycles
-            </p>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {failureRiskData.map((period, index) => {
-                const criticalPct = (period.critical / period.total) * 100;
-                const warningPct = (period.warning / period.total) * 100;
-
-                return (
-                  <div key={period.period} className="space-y-2">
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm font-medium">{period.period}</span>
-                      <span className="text-sm text-muted-foreground">Total: {period.total} engines</span>
-                    </div>
-                    <div className="relative h-6 bg-gray-100 rounded overflow-hidden">
-                      <div
-                        className="absolute left-0 top-0 h-full bg-red-500"
-                        style={{ width: `${criticalPct}%` }}
-                      />
-                      <div
-                        className="absolute left-0 top-0 h-full bg-yellow-500"
-                        style={{ left: `${criticalPct}%`, width: `${warningPct}%` }}
-                      />
-                    </div>
-                    <div className="flex justify-between text-xs">
-                      <span className="text-red-600">Critical: {period.critical} engines</span>
-                      <span className="text-yellow-600">Warning: {period.warning} engines</span>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Right - Operational Conditions Monitoring (40%) */}
+        {/* Right - Operational Conditions Monitoring */}
         <Card>
           <CardHeader>
             <CardTitle>Operational Conditions Monitoring</CardTitle>
