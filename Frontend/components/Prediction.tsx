@@ -24,7 +24,7 @@ const generateEngineData = () => {
     const dataset = datasets[Math.floor(Math.random() * 4)];
     const rul = Math.floor(Math.random() * 180) + 5;
     const currentCycle = Math.floor(Math.random() * 200) + 50;
-    
+
     engines.push({
       id: i,
       dataset: dataset,
@@ -55,7 +55,7 @@ const generateEngineData = () => {
       }))
     });
   }
-  
+
   return engines.sort((a, b) => a.rul - b.rul);
 };
 
@@ -68,18 +68,18 @@ export function Prediction() {
   const [rulRange, setRulRange] = useState([0, 200]);
 
   const filteredEngines = engines.filter(engine => {
-    const matchesSearch = engine.id.toString().includes(searchTerm) || 
-                         engine.dataset.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = engine.id.toString().includes(searchTerm) ||
+      engine.dataset.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesDataset = selectedDatasets.includes(engine.dataset);
     const matchesStatus = statusFilter === 'all' || engine.status === statusFilter;
     const matchesRUL = engine.rul >= rulRange[0] && engine.rul <= rulRange[1];
-    
+
     return matchesSearch && matchesDataset && matchesStatus && matchesRUL;
   });
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case 'critical': return <Badge variant="destructive">Critical</Badge>;
+      case 'critical': return <Badge className="bg-white text-red-600 border-red-600 border-2">Critical</Badge>;
       case 'warning': return <Badge className="bg-yellow-100 text-yellow-800 border-yellow-200">Warning</Badge>;
       case 'healthy': return <Badge className="bg-green-100 text-green-800 border-green-200">Healthy</Badge>;
       default: return null;
@@ -129,8 +129,8 @@ export function Prediction() {
           <div className="flex gap-4">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-              <Input 
-                placeholder="Enter Engine ID to search..." 
+              <Input
+                placeholder="Enter Engine ID to search..."
                 className="pl-10"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -155,7 +155,7 @@ export function Prediction() {
             <div className="flex gap-4">
               {['FD001', 'FD002', 'FD003', 'FD004'].map((dataset) => (
                 <div key={dataset} className="flex items-center space-x-2">
-                  <Checkbox 
+                  <Checkbox
                     id={dataset}
                     checked={selectedDatasets.includes(dataset)}
                     onCheckedChange={(checked) => {
@@ -213,9 +213,8 @@ export function Prediction() {
                 {filteredEngines.map((engine) => (
                   <div
                     key={engine.id}
-                    className={`p-3 rounded-lg border-l-4 cursor-pointer transition-colors ${getStatusColor(engine.status)} ${
-                      selectedEngine.id === engine.id ? 'ring-2 ring-blue-500' : 'hover:bg-gray-50'
-                    }`}
+                    className={`p-3 rounded-lg border-l-4 cursor-pointer transition-colors ${getStatusColor(engine.status)} ${selectedEngine.id === engine.id ? 'ring-2 ring-blue-500' : 'hover:bg-gray-50'
+                      }`}
                     onClick={() => setSelectedEngine(engine)}
                   >
                     <div className="flex items-center justify-between mb-2">
@@ -229,7 +228,15 @@ export function Prediction() {
                         {engine.currentCycle} / {engine.totalCycles}
                       </span>
                     </div>
-                    <Progress value={(engine.rul / 200) * 100} className="h-2" />
+                    {/* RUL Progress Bar */}
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div
+                        className={`h-2 rounded-full transition-all duration-300 ${engine.status === 'critical' ? 'bg-red-500' :
+                            engine.status === 'warning' ? 'bg-yellow-500' : 'bg-green-500'
+                          }`}
+                        style={{ width: `${(engine.rul / engine.totalCycles) * 100}%` }}
+                      />
+                    </div>
                   </div>
                 ))}
               </div>
@@ -265,7 +272,7 @@ export function Prediction() {
                     <p className="text-xl font-bold">{selectedEngine.rul} cycles</p>
                   </div>
                 </div>
-                
+
                 <div className="mt-4">
                   <div className="flex justify-between items-center mb-2">
                     <span className="text-sm">Prediction Confidence</span>
@@ -301,16 +308,16 @@ export function Prediction() {
                     const maxRUL = Math.max(...selectedEngine.rulHistory.map(p => p.actualRUL));
                     const actualHeight = (point.actualRUL / maxRUL) * 160;
                     const predictedHeight = (point.predictedRUL / maxRUL) * 160;
-                    
+
                     return (
                       <div key={index} className="flex flex-col items-center gap-1">
                         <div className="flex items-end gap-1">
-                          <div 
+                          <div
                             className="w-3 bg-blue-500 rounded-t"
                             style={{ height: `${actualHeight}px` }}
                             title={`Actual: ${point.actualRUL.toFixed(1)}`}
                           />
-                          <div 
+                          <div
                             className="w-3 bg-blue-300 rounded-t"
                             style={{ height: `${predictedHeight}px` }}
                             title={`Predicted: ${point.predictedRUL.toFixed(1)}`}
@@ -353,15 +360,20 @@ export function Prediction() {
                 ].map((item) => (
                   <div key={item.period} className="text-center">
                     <h4 className="text-sm font-medium mb-2">{item.period}</h4>
-                    <div className="text-3xl font-bold mb-2" style={{ 
+                    <div className="text-3xl font-bold mb-2" style={{
                       color: item.probability > 70 ? '#ef4444' : item.probability > 40 ? '#f97316' : '#eab308'
                     }}>
                       {item.probability.toFixed(1)}%
                     </div>
-                    <Progress 
-                      value={item.probability} 
-                      className="h-3"
-                    />
+                    <div className="w-full bg-gray-200 rounded-full h-3 mb-1">
+                      <div
+                        className="h-3 rounded-full transition-all duration-300 ease-in-out"
+                        style={{
+                          width: `${item.probability}%`,
+                          backgroundColor: item.probability > 70 ? '#ef4444' : item.probability > 40 ? '#f97316' : '#eab308'
+                        }}
+                      />
+                    </div>
                     <p className="text-xs text-muted-foreground mt-1">Failure Probability</p>
                   </div>
                 ))}
@@ -383,11 +395,10 @@ export function Prediction() {
                 {Object.entries(selectedEngine.sensors).map(([sensorId, sensor]) => {
                   const status = getSensorStatus(sensor.value, sensor.normal);
                   const isAbnormal = status === 'abnormal';
-                  
+
                   return (
-                    <div key={sensorId} className={`p-3 rounded-lg border-2 ${
-                      isAbnormal ? 'border-red-200 bg-red-50' : 'border-green-200 bg-green-50'
-                    }`}>
+                    <div key={sensorId} className={`p-3 rounded-lg border-2 ${isAbnormal ? 'border-red-200 bg-red-50' : 'border-green-200 bg-green-50'
+                      }`}>
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-2">
                           {getSensorIcon(sensor.icon)}
