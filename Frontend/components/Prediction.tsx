@@ -231,7 +231,7 @@ export function Prediction() {
                     <div className="w-full bg-gray-200 rounded-full h-2">
                       <div
                         className={`h-2 rounded-full transition-all duration-300 ${engine.status === 'critical' ? 'bg-red-500' :
-                            engine.status === 'warning' ? 'bg-yellow-500' : 'bg-green-500'
+                          engine.status === 'warning' ? 'bg-yellow-500' : 'bg-green-500'
                           }`}
                         style={{ width: `${(engine.rul / engine.totalCycles) * 100}%` }}
                       />
