@@ -82,41 +82,50 @@ export function Navigation({ currentPage, onPageChange }: { currentPage: string,
                 <Menu className="w-4 h-4" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="w-[280px] bg-white p-6">
-              <div className="flex flex-col gap-4 mt-6">
-                <h2 className="font-semibold mb-4">Navigation</h2>
-                {[
-                  { id: 'dashboard', label: 'Dashboard' },
-                  { id: 'prediction', label: 'RUL Prediction' },
-                  { id: 'maintenance', label: 'Maintenance' }
-                ].map((item) => (
-                  <Button
-                    key={item.id}
-                    variant={currentPage === item.id ? "secondary" : "ghost"}
-                    onClick={() => onPageChange(item.id)}
-                    className="justify-start h-10"
-                  >
-                    {item.label}
-                  </Button>
-                ))}
+            <SheetContent side="right" className="w-[280px] bg-white">
+              <div className="flex flex-col gap-6 p-6">
+                <div>
+                  <h2 className="text-lg font-semibold text-gray-900 mb-4">Navigation</h2>
+                  <div className="space-y-2">
+                    {[
+                      { id: 'dashboard', label: 'Dashboard' },
+                      { id: 'prediction', label: 'RUL Prediction' },
+                      { id: 'maintenance', label: 'Maintenance' }
+                    ].map((item) => (
+                      <Button
+                        key={item.id}
+                        variant={currentPage === item.id ? "secondary" : "ghost"}
+                        onClick={() => onPageChange(item.id)}
+                        className="w-full justify-start h-10 text-sm font-medium"
+                      >
+                        {item.label}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
                 
-                <div className="border-t pt-4 mt-4">
-                  <h3 className="font-medium mb-3">Actions</h3>
+                <div className="border-t border-gray-200 pt-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Actions</h3>
                   
                   {/* Mobile Search */}
-                  <div className="relative mb-3">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-                    <Input 
-                      placeholder="Search engines..." 
-                      className="pl-10 h-9"
-                    />
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Search</label>
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                      <Input 
+                        placeholder="Search engines..." 
+                        className="pl-10 h-10 text-sm border-gray-300 focus:border-blue-500"
+                      />
+                    </div>
                   </div>
                   
                   {/* New Analysis */}
-                  <Button className="w-full gap-2 h-10">
-                    <Plus className="w-4 h-4" />
-                    New Analysis
-                  </Button>
+                  <div>
+                    <Button className="w-full justify-start h-10 text-sm font-medium">
+                      <Plus className="w-4 h-4 mr-2" />
+                      New Analysis
+                    </Button>
+                  </div>
                 </div>
               </div>
             </SheetContent>
