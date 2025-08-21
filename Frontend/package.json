@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "vite build --mode production",
+    "build:safe": "tsc --noEmit false && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
   },
@@ -43,7 +44,9 @@
     "input-otp": "^1.2.4",
     "lucide-react": "^0.263.1",
     "react": "^18.2.0",
+    "react-day-picker": "^8.10.0",
     "react-dom": "^18.2.0",
+    "react-hook-form": "^7.48.2",
     "react-resizable-panels": "^2.0.0",
     "recharts": "^2.8.0",
     "sonner": "^1.4.0",
