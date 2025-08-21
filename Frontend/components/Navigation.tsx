@@ -16,7 +16,7 @@ const notifications = [
   },
   {
     id: 2,
-    title: "High Failure Probability Detected", 
+    title: "High Failure Probability Detected",
     message: "Engine E-045 shows 87% failure probability within 15 cycles",
     time: "15 mins ago",
     priority: "high"
@@ -25,7 +25,7 @@ const notifications = [
     id: 3,
     title: "Maintenance Schedule Optimization",
     message: "AI suggests batching maintenance for engines E-001, E-007, E-012",
-    time: "1 hour ago", 
+    time: "1 hour ago",
     priority: "medium"
   }
 ];
@@ -48,7 +48,7 @@ export function Navigation({ currentPage, onPageChange }: { currentPage: string,
               <p className="text-xs text-muted-foreground truncate hidden md:block">NASA C-MAPSS Predictive Analytics System</p>
             </div>
           </div>
-          
+
           {/* Navigation Links */}
           <div className="hidden lg:flex items-center gap-1">
             {[
@@ -103,22 +103,22 @@ export function Navigation({ currentPage, onPageChange }: { currentPage: string,
                     ))}
                   </div>
                 </div>
-                
+
                 <div className="border-t border-gray-200 pt-6">
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">Actions</h3>
-                  
+
                   {/* Mobile Search */}
                   <div className="mb-4">
                     <label className="block text-sm font-medium text-gray-700 mb-2">Search</label>
                     <div className="relative">
                       <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                      <Input 
-                        placeholder="Search engines..." 
+                      <Input
+                        placeholder="Search engines..."
                         className="pl-10 h-10 text-sm border-gray-300 focus:border-blue-500"
                       />
                     </div>
                   </div>
-                  
+
                   {/* New Analysis */}
                   <div>
                     <Button className="w-full justify-start h-10 text-sm font-medium">
@@ -134,8 +134,8 @@ export function Navigation({ currentPage, onPageChange }: { currentPage: string,
           {/* Desktop Search */}
           <div className="relative w-32 sm:w-48 lg:w-64 hidden sm:block">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-            <Input 
-              placeholder="Search engines..." 
+            <Input
+              placeholder="Search engines..."
               className="pl-10 h-9"
             />
           </div>
@@ -163,11 +163,11 @@ export function Navigation({ currentPage, onPageChange }: { currentPage: string,
                 <DropdownMenuItem key={notification.id} className="flex flex-col items-start p-3 cursor-pointer">
                   <div className="flex items-center justify-between w-full mb-1">
                     <span className="text-sm font-medium truncate pr-2">{notification.title}</span>
-                    <Badge 
+                    <Badge
                       variant={
-                        notification.priority === 'critical' ? 'destructive' : 
-                        notification.priority === 'high' ? 'outline' : 
-                        'secondary'
+                        notification.priority === 'critical' ? 'destructive' :
+                          notification.priority === 'high' ? 'outline' :
+                            'secondary'
                       }
                       className={
                         notification.priority === 'high' ? 'bg-yellow-50 text-yellow-700 border-yellow-200' : ''

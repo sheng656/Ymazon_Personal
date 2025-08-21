@@ -113,7 +113,7 @@ export function AnomalyDetection() {
           AI-powered detection of engine abnormalities
         </p>
       </CardHeader>
-      <CardContent>
+      <CardContent className="flex-1 flex flex-col">
         {/* Summary Statistics */}
         <div className="grid grid-cols-4 gap-2 mb-4">
           <div className="text-center p-2 bg-red-50 rounded-lg">
@@ -135,7 +135,7 @@ export function AnomalyDetection() {
         </div>
 
         {/* Active Anomalies List */}
-        <div className="space-y-2 max-h-80 overflow-y-auto">
+        <div className="flex-1 space-y-2 overflow-y-auto" style={{ maxHeight: '36rem' }}>
           <h4 className="font-medium text-gray-700 mb-2">Active Anomalies</h4>
           {anomalies.map((anomaly, index) => (
             <div key={index} className="border rounded-lg p-3 hover:bg-gray-50 transition-colors">
