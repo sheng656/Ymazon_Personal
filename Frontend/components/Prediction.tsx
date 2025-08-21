@@ -3,11 +3,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Badge } from "./ui/badge";
-import { Progress } from "./ui/progress";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { Checkbox } from "./ui/checkbox";
 import { Slider } from "./ui/slider";
-import { Search, Filter, Clock, AlertTriangle, Activity, Thermometer, Gauge, Zap, BarChart3 } from "lucide-react";
+import { Search, Filter, AlertTriangle, Activity, Thermometer, Gauge, Zap, BarChart3 } from "lucide-react";
 
 // Generate mock engine data
 const generateEngineData = () => {
@@ -246,103 +245,34 @@ export function Prediction() {
 
         {/* Right - Detailed Prediction Analysis (70%) */}
         <div className="lg:col-span-7 space-y-6">
-          {/* Top - RUL Prediction Details (40%) */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            {/* Current engine information card */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Engine {selectedEngine.id} Basic Info</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="grid grid-cols-2 gap-3 text-sm">
-                  <div>
-                    <span className="text-muted-foreground">Dataset:</span>
-                    <Badge variant="outline" className="ml-2">{selectedEngine.dataset}</Badge>
-                  </div>
-                  <div>
-                    <span className="text-muted-foreground">Fault Mode:</span>
-                    <p className="font-medium">{selectedEngine.faultMode}</p>
-                  </div>
-                  <div>
-                    <span className="text-muted-foreground">Current Cycle:</span>
-                    <p className="font-medium">{selectedEngine.currentCycle}</p>
-                  </div>
-                  <div>
-                    <span className="text-muted-foreground">Predicted RUL:</span>
-                    <p className="text-xl font-bold">{selectedEngine.rul} cycles</p>
-                  </div>
+          {/* Top - Engine Basic Info */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Engine {selectedEngine.id} Basic Info</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="grid grid-cols-2 gap-3 text-sm">
+                <div>
+                  <span className="text-muted-foreground">Dataset:</span>
+                  <Badge variant="outline" className="ml-2">{selectedEngine.dataset}</Badge>
                 </div>
-
-                <div className="mt-4">
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="text-sm">Prediction Confidence</span>
-                    <span className="text-sm font-medium">{selectedEngine.confidence.toFixed(1)}%</span>
-                  </div>
-                  <Progress value={selectedEngine.confidence} className="h-2" />
+                <div>
+                  <span className="text-muted-foreground">Fault Mode:</span>
+                  <p className="font-medium">{selectedEngine.faultMode}</p>
                 </div>
-
-                <div className="grid grid-cols-2 gap-3 mt-4">
-                  <div className="text-center p-2 bg-blue-50 rounded">
-                    <p className="text-xs text-muted-foreground">RMSE</p>
-                    <p className="font-medium">{selectedEngine.rmse.toFixed(1)}</p>
-                  </div>
-                  <div className="text-center p-2 bg-blue-50 rounded">
-                    <p className="text-xs text-muted-foreground">MAE</p>
-                    <p className="font-medium">{selectedEngine.mae.toFixed(1)}</p>
-                  </div>
+                <div>
+                  <span className="text-muted-foreground">Current Cycle:</span>
+                  <p className="font-medium">{selectedEngine.currentCycle}</p>
                 </div>
-              </CardContent>
-            </Card>
-
-            {/* RUL trend chart */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Clock className="w-4 h-4" />
-                  RUL Trend Chart
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="h-48 flex items-end justify-between">
-                  {selectedEngine.rulHistory.slice(-10).map((point, index) => {
-                    const maxRUL = Math.max(...selectedEngine.rulHistory.map(p => p.actualRUL));
-                    const actualHeight = (point.actualRUL / maxRUL) * 160;
-                    const predictedHeight = (point.predictedRUL / maxRUL) * 160;
-
-                    return (
-                      <div key={index} className="flex flex-col items-center gap-1">
-                        <div className="flex items-end gap-1">
-                          <div
-                            className="w-3 bg-blue-500 rounded-t"
-                            style={{ height: `${actualHeight}px` }}
-                            title={`Actual: ${point.actualRUL.toFixed(1)}`}
-                          />
-                          <div
-                            className="w-3 bg-blue-300 rounded-t"
-                            style={{ height: `${predictedHeight}px` }}
-                            title={`Predicted: ${point.predictedRUL.toFixed(1)}`}
-                          />
-                        </div>
-                        <span className="text-xs text-muted-foreground">{point.cycle}</span>
-                      </div>
-                    );
-                  })}
+                <div>
+                  <span className="text-muted-foreground">Predicted RUL:</span>
+                  <p className="text-xl font-bold">{selectedEngine.rul} cycles</p>
                 </div>
-                <div className="flex items-center gap-4 mt-3 text-xs">
-                  <div className="flex items-center gap-1">
-                    <div className="w-3 h-3 bg-blue-500 rounded"></div>
-                    <span>Actual RUL</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <div className="w-3 h-3 bg-blue-300 rounded"></div>
-                    <span>Predicted RUL</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+              </div>
+            </CardContent>
+          </Card>
 
-          {/* Middle - Failure Probability Prediction (35%) */}
+          {/* Failure Probability Prediction */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
