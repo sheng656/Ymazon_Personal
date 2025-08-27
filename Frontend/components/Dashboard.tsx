@@ -76,10 +76,9 @@ const operationalConditions = [
 
 // Future failure risk prediction data
 const failureRiskData = [
-  { period: '0-15 cycles', critical: 63, warning: 25, total: 88 },
-  { period: '16-30 cycles', critical: 45, warning: 67, total: 112 },
-  { period: '31-45 cycles', critical: 23, warning: 89, total: 112 },
-  { period: '46-60 cycles', critical: 12, warning: 78, total: 90 }
+  { period: '0-15 cycles', critical: 63, warning: 25, health: 45, total: 133 },
+  { period: '16-30 cycles', critical: 45, warning: 67, health: 78, total: 190 },
+  { period: '31-60 cycles', critical: 23, warning: 89, health: 123, total: 235 }
 ];
 
 export function Dashboard() {
@@ -187,51 +186,23 @@ export function Dashboard() {
         {/* Left - Anomaly Detection */}
         <AnomalyDetection />
 
-        {/* Center - RUL Analysis (Distribution + Risk Timeline) */}
+        {/* Center - Failure Risk Timeline */}
         <Card>
           <CardHeader>
-            <CardTitle>RUL Analysis</CardTitle>
+            <CardTitle>Failure Risk Timeline</CardTitle>
             <p className="text-sm text-muted-foreground">
-              Fleet health distribution and failure risk timeline
+              Predicted failure engine count in next 60 cycles
             </p>
           </CardHeader>
           <CardContent>
-            {/* RUL Distribution Histogram */}
-            <div className="mb-6">
-              <h4 className="font-medium text-gray-700 mb-3">Current RUL Distribution</h4>
-              <div className="space-y-3">
-                {rulDistribution.map((item) => {
-                  const percentage = (item.count / fleetStats.total) * 100;
-                  const maxCount = Math.max(...rulDistribution.map(d => d.count));
-                  const barHeight = (item.count / maxCount) * 80; // Reduced height for compact layout
-                  
-                  return (
-                    <div key={item.range} className="flex items-end gap-3">
-                      <div className="w-12 text-xs text-muted-foreground">{item.range}</div>
-                      <div className="flex-1">
-                        <div 
-                          className={`${item.color} rounded-t`}
-                          style={{ height: `${barHeight}px`, minHeight: '12px' }}
-                        />
-                        <div className="flex justify-between text-xs mt-1">
-                          <span>{item.count}</span>
-                          <span>{percentage.toFixed(1)}%</span>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
             {/* Failure Risk Timeline */}
             <div>
-              <h4 className="font-medium text-gray-700 mb-3">Failure Risk Timeline</h4>
               <div className="space-y-3">
                 {failureRiskData.map((period) => {
                   const criticalPct = (period.critical / period.total) * 100;
                   const warningPct = (period.warning / period.total) * 100;
-                  
+                  const healthPct = (period.health / period.total) * 100;
+
                   return (
                     <div key={period.period} className="space-y-2">
                       <div className="flex justify-between items-center">
@@ -239,18 +210,23 @@ export function Dashboard() {
                         <span className="text-xs text-muted-foreground">{period.total} engines</span>
                       </div>
                       <div className="relative h-4 bg-gray-100 rounded overflow-hidden">
-                        <div 
+                        <div
                           className="absolute left-0 top-0 h-full bg-red-500"
                           style={{ width: `${criticalPct}%` }}
                         />
-                        <div 
+                        <div
                           className="absolute left-0 top-0 h-full bg-yellow-500"
                           style={{ left: `${criticalPct}%`, width: `${warningPct}%` }}
+                        />
+                        <div
+                          className="absolute left-0 top-0 h-full bg-green-500"
+                          style={{ left: `${criticalPct + warningPct}%`, width: `${healthPct}%` }}
                         />
                       </div>
                       <div className="flex justify-between text-xs">
                         <span className="text-red-600">Critical: {period.critical}</span>
                         <span className="text-yellow-600">Warning: {period.warning}</span>
+                        <span className="text-green-600">Health: {period.health}</span>
                       </div>
                     </div>
                   );
