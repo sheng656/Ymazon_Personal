@@ -161,40 +161,42 @@ export function AnomalyDetection() {
         </div>
 
         {/* Active Anomalies List */}
-        <div className="flex-1 space-y-2 overflow-y-auto" style={{ maxHeight: '36rem' }}>
-          <h4 className="font-medium text-gray-700 mb-2">Active Anomalies</h4>
-          {engineAnomalies.map((engine, index) => (
-            <div key={index} className="border rounded-lg p-3 hover:bg-gray-50 transition-colors">
-              <div className="flex items-start justify-between mb-2">
-                <div className="flex items-center gap-2">
-                  <span className="font-medium text-gray-900 text-sm">{engine.engineId}</span>
-                  <Badge className={`text-xs ${getSeverityColor(engine.severity)}`}>
-                    {engine.severity.toUpperCase()}
-                  </Badge>
+        <div className="flex-1 flex flex-col min-h-0">
+          <h4 className="font-medium text-gray-700 mb-2 sticky top-0 bg-white z-10 py-2 border-b border-gray-100">Active Anomalies</h4>
+          <div className="flex-1 space-y-2 overflow-y-auto" style={{ maxHeight: '36rem' }}>
+            {engineAnomalies.map((engine, index) => (
+              <div key={index} className="border rounded-lg p-3 hover:bg-gray-50 transition-colors">
+                <div className="flex items-start justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium text-gray-900 text-sm">{engine.engineId}</span>
+                    <Badge className={`text-xs ${getSeverityColor(engine.severity)}`}>
+                      {engine.severity.toUpperCase()}
+                    </Badge>
+                  </div>
+                  <div className="text-xs text-gray-500">
+                    Cycle: {engine.currentCycle}
+                  </div>
                 </div>
-                <div className="text-xs text-gray-500">
-                  Cycle: {engine.currentCycle}
-                </div>
-              </div>
 
-              <div className="space-y-1">
-                {engine.anomalies.map((anomaly, anomalyIndex) => (
-                  <div key={anomalyIndex} className="flex items-center justify-between text-xs">
-                    <div className="flex items-center gap-1">
-                      {getSensorIcon(anomaly.sensorType)}
-                      <span className="text-gray-700">{anomaly.sensorType}</span>
-                    </div>
-                    <div className="text-right">
-                      <span className="text-red-600 font-medium">{anomaly.value}</span>
-                      <div className="text-gray-500">
-                        Normal: {anomaly.normalRange[0]}-{anomaly.normalRange[1]}
+                <div className="space-y-1">
+                  {engine.anomalies.map((anomaly, anomalyIndex) => (
+                    <div key={anomalyIndex} className="flex items-center justify-between text-xs">
+                      <div className="flex items-center gap-1">
+                        {getSensorIcon(anomaly.sensorType)}
+                        <span className="text-gray-700">{anomaly.sensorType}</span>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-red-600 font-medium">{anomaly.value}</span>
+                        <div className="text-gray-500">
+                          Normal: {anomaly.normalRange[0]}-{anomaly.normalRange[1]}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
 
         {/* Detection Algorithm Info */}
