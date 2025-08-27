@@ -1,86 +1,100 @@
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
-import { AlertTriangle, AlertCircle, Activity, TrendingUp } from 'lucide-react';
+import { AlertTriangle, Thermometer, Gauge, Zap, BarChart3 } from 'lucide-react';
 
-interface AnomalyData {
+interface SensorAnomaly {
   engineId: string;
-  anomalyType: 'vibration' | 'temperature' | 'pressure' | 'performance';
-  severity: 'low' | 'medium' | 'high' | 'critical';
-  detectedAt: string;
-  confidence: number;
-  description: string;
+  currentCycle: number;
+  severity: 'critical' | 'high' | 'medium' | 'low';
+  anomalies: {
+    sensorType: 'HPC Outlet Temperature' | 'HPC Outlet Pressure' | 'Core Speed' | 'Engine Pressure Ratio';
+    value: number;
+    normalRange: [number, number];
+    deviation: number;
+  }[];
 }
 
-export function AnomalyDetection() {
-  // Simulated anomaly data
-  const anomalies: AnomalyData[] = [
-    {
-      engineId: 'ENG-001',
-      anomalyType: 'vibration',
-      severity: 'critical',
-      detectedAt: '2025-08-20 14:23',
-      confidence: 0.95,
-      description: 'Abnormal vibration pattern detected in fan assembly'
-    },
-    {
-      engineId: 'ENG-045',
-      anomalyType: 'temperature',
-      severity: 'high',
-      detectedAt: '2025-08-20 13:15',
-      confidence: 0.87,
-      description: 'Exhaust gas temperature exceeding normal range'
-    },
-    {
-      engineId: 'ENG-123',
-      anomalyType: 'performance',
-      severity: 'medium',
-      detectedAt: '2025-08-20 12:45',
-      confidence: 0.76,
-      description: 'Thrust output declining below expected baseline'
-    },
-    {
-      engineId: 'ENG-089',
-      anomalyType: 'pressure',
-      severity: 'low',
-      detectedAt: '2025-08-20 11:30',
-      confidence: 0.68,
-      description: 'Minor pressure fluctuation in combustion chamber'
-    },
-    {
-      engineId: 'ENG-267',
-      anomalyType: 'vibration',
-      severity: 'medium',
-      detectedAt: '2025-08-20 10:15',
-      confidence: 0.82,
-      description: 'Unusual frequency pattern in compressor section'
-    },
-    {
-      engineId: 'ENG-155',
-      anomalyType: 'performance',
-      severity: 'low',
-      detectedAt: '2025-08-20 09:45',
-      confidence: 0.71,
-      description: 'Fuel consumption slightly above normal parameters'
-    },
-    {
-      engineId: 'ENG-203',
-      anomalyType: 'temperature',
-      severity: 'medium',
-      detectedAt: '2025-08-20 08:30',
-      confidence: 0.79,
-      description: 'Oil temperature trending upward beyond optimal range'
-    },
+// Generate mock engine anomaly data
+const generateEngineAnomalies = (): SensorAnomaly[] => {
+  const anomalies: SensorAnomaly[] = [];
+
+  // Generate anomalies for various engines
+  const anomalyEngines = [
+    { id: 'ENG-001', cycle: 245, severity: 'critical' as const },
+    { id: 'ENG-045', cycle: 189, severity: 'critical' as const },
+    { id: 'ENG-123', cycle: 156, severity: 'high' as const },
+    { id: 'ENG-089', cycle: 203, severity: 'high' as const },
+    { id: 'ENG-267', cycle: 178, severity: 'medium' as const },
+    { id: 'ENG-155', cycle: 234, severity: 'medium' as const },
+    { id: 'ENG-203', cycle: 167, severity: 'medium' as const },
+    { id: 'ENG-078', cycle: 198, severity: 'low' as const },
+    { id: 'ENG-145', cycle: 221, severity: 'low' as const },
   ];
 
-  const anomalyStats = {
-    total: 7,
-    critical: 1,
-    high: 1,
-    medium: 3,
-    low: 2,
-    resolved: 15,
-    avgConfidence: 0.80
+  anomalyEngines.forEach(engine => {
+    const engineAnomalies: SensorAnomaly['anomalies'] = [];
+
+    // Randomly assign 1-3 sensor anomalies per engine
+    const sensorTypes = [
+      { type: 'HPC Outlet Temperature' as const, normalRange: [1520, 1620] as [number, number], baseValue: 1580 },
+      { type: 'HPC Outlet Pressure' as const, normalRange: [360, 420] as [number, number], baseValue: 390 },
+      { type: 'Core Speed' as const, normalRange: [8800, 9200] as [number, number], baseValue: 9000 },
+      { type: 'Engine Pressure Ratio' as const, normalRange: [1.2, 1.4] as [number, number], baseValue: 1.3 }
+    ];
+
+    const numAnomalies = Math.floor(Math.random() * 3) + 1; // 1-3 anomalies
+    const selectedSensors = sensorTypes.sort(() => Math.random() - 0.5).slice(0, numAnomalies);
+
+    selectedSensors.forEach(sensor => {
+      const deviationMultiplier = engine.severity === 'critical' ? 2.5 :
+        engine.severity === 'high' ? 2.0 :
+          engine.severity === 'medium' ? 1.5 : 1.2;
+
+      const isAboveRange = Math.random() > 0.5;
+      const value = isAboveRange ?
+        sensor.normalRange[1] + (sensor.normalRange[1] - sensor.normalRange[0]) * 0.1 * deviationMultiplier :
+        sensor.normalRange[0] - (sensor.normalRange[1] - sensor.normalRange[0]) * 0.1 * deviationMultiplier;
+
+      const deviation = Math.abs(value - sensor.baseValue) / sensor.baseValue * 100;
+
+      engineAnomalies.push({
+        sensorType: sensor.type,
+        value: Math.round(value * 100) / 100,
+        normalRange: sensor.normalRange,
+        deviation: Math.round(deviation * 10) / 10
+      });
+    });
+
+    anomalies.push({
+      engineId: engine.id,
+      currentCycle: engine.cycle,
+      severity: engine.severity,
+      anomalies: engineAnomalies
+    });
+  });
+
+  return anomalies.sort((a, b) => {
+    const severityOrder = { critical: 4, high: 3, medium: 2, low: 1 };
+    return severityOrder[b.severity] - severityOrder[a.severity];
+  });
+};
+
+export function AnomalyDetection() {
+  const engineAnomalies = generateEngineAnomalies();
+
+  // Calculate sensor statistics across all engines
+  const sensorStats = {
+    'HPC Outlet Temperature': 0,
+    'HPC Outlet Pressure': 0,
+    'Core Speed': 0,
+    'Engine Pressure Ratio': 0
   };
+
+  engineAnomalies.forEach(engine => {
+    engine.anomalies.forEach(anomaly => {
+      sensorStats[anomaly.sensorType]++;
+    });
+  });
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
@@ -92,12 +106,12 @@ export function AnomalyDetection() {
     }
   };
 
-  const getAnomalyIcon = (type: string) => {
-    switch (type) {
-      case 'vibration': return <Activity className="w-4 h-4" />;
-      case 'temperature': return <TrendingUp className="w-4 h-4" />;
-      case 'pressure': return <AlertCircle className="w-4 h-4" />;
-      case 'performance': return <AlertTriangle className="w-4 h-4" />;
+  const getSensorIcon = (sensorType: string) => {
+    switch (sensorType) {
+      case 'HPC Outlet Temperature': return <Thermometer className="w-4 h-4" />;
+      case 'HPC Outlet Pressure': return <Gauge className="w-4 h-4" />;
+      case 'Core Speed': return <Zap className="w-4 h-4" />;
+      case 'Engine Pressure Ratio': return <BarChart3 className="w-4 h-4" />;
       default: return <AlertTriangle className="w-4 h-4" />;
     }
   };
@@ -110,53 +124,74 @@ export function AnomalyDetection() {
           Real-time Anomaly Detection
         </CardTitle>
         <p className="text-sm text-muted-foreground">
-          AI-powered detection of engine abnormalities
+          Sensor anomaly statistics across fleet engines
         </p>
       </CardHeader>
       <CardContent className="flex-1 flex flex-col">
-        {/* Summary Statistics */}
-        <div className="grid grid-cols-4 gap-2 mb-4">
+        {/* Sensor Anomaly Statistics */}
+        <div className="grid grid-cols-2 gap-2 mb-4">
           <div className="text-center p-2 bg-red-50 rounded-lg">
-            <div className="text-xl font-bold text-red-600">{anomalyStats.critical}</div>
-            <div className="text-xs text-red-700">Critical</div>
+            <div className="flex items-center justify-center gap-1 mb-1">
+              <Thermometer className="w-3 h-3 text-red-600" />
+              <div className="text-lg font-bold text-red-600">{sensorStats['HPC Outlet Temperature']}</div>
+            </div>
+            <div className="text-xs text-red-700">HPC Outlet Temp</div>
           </div>
           <div className="text-center p-2 bg-orange-50 rounded-lg">
-            <div className="text-xl font-bold text-orange-600">{anomalyStats.high}</div>
-            <div className="text-xs text-orange-700">High</div>
+            <div className="flex items-center justify-center gap-1 mb-1">
+              <Gauge className="w-3 h-3 text-orange-600" />
+              <div className="text-lg font-bold text-orange-600">{sensorStats['HPC Outlet Pressure']}</div>
+            </div>
+            <div className="text-xs text-orange-700">HPC Outlet Press</div>
           </div>
           <div className="text-center p-2 bg-yellow-50 rounded-lg">
-            <div className="text-xl font-bold text-yellow-600">{anomalyStats.medium}</div>
-            <div className="text-xs text-yellow-700">Medium</div>
+            <div className="flex items-center justify-center gap-1 mb-1">
+              <Zap className="w-3 h-3 text-yellow-600" />
+              <div className="text-lg font-bold text-yellow-600">{sensorStats['Core Speed']}</div>
+            </div>
+            <div className="text-xs text-yellow-700">Core Speed</div>
           </div>
-          <div className="text-center p-2 bg-green-50 rounded-lg">
-            <div className="text-xl font-bold text-green-600">{anomalyStats.resolved}</div>
-            <div className="text-xs text-green-700">Resolved</div>
+          <div className="text-center p-2 bg-blue-50 rounded-lg">
+            <div className="flex items-center justify-center gap-1 mb-1">
+              <BarChart3 className="w-3 h-3 text-blue-600" />
+              <div className="text-lg font-bold text-blue-600">{sensorStats['Engine Pressure Ratio']}</div>
+            </div>
+            <div className="text-xs text-blue-700">Engine Press Ratio</div>
           </div>
         </div>
 
         {/* Active Anomalies List */}
         <div className="flex-1 space-y-2 overflow-y-auto" style={{ maxHeight: '36rem' }}>
           <h4 className="font-medium text-gray-700 mb-2">Active Anomalies</h4>
-          {anomalies.map((anomaly, index) => (
+          {engineAnomalies.map((engine, index) => (
             <div key={index} className="border rounded-lg p-3 hover:bg-gray-50 transition-colors">
-              <div className="flex items-start justify-between mb-1">
+              <div className="flex items-start justify-between mb-2">
                 <div className="flex items-center gap-2">
-                  {getAnomalyIcon(anomaly.anomalyType)}
-                  <span className="font-medium text-gray-900 text-sm">{anomaly.engineId}</span>
-                  <Badge className={`text-xs ${getSeverityColor(anomaly.severity)}`}>
-                    {anomaly.severity.toUpperCase()}
+                  <span className="font-medium text-gray-900 text-sm">{engine.engineId}</span>
+                  <Badge className={`text-xs ${getSeverityColor(engine.severity)}`}>
+                    {engine.severity.toUpperCase()}
                   </Badge>
                 </div>
                 <div className="text-xs text-gray-500">
-                  {(anomaly.confidence * 100).toFixed(0)}%
+                  Cycle: {engine.currentCycle}
                 </div>
               </div>
 
-              <p className="text-xs text-gray-700 mb-2">{anomaly.description}</p>
-
-              <div className="flex justify-between items-center text-xs text-gray-500">
-                <span>{anomaly.anomalyType.toUpperCase()}</span>
-                <span>{anomaly.detectedAt}</span>
+              <div className="space-y-1">
+                {engine.anomalies.map((anomaly, anomalyIndex) => (
+                  <div key={anomalyIndex} className="flex items-center justify-between text-xs">
+                    <div className="flex items-center gap-1">
+                      {getSensorIcon(anomaly.sensorType)}
+                      <span className="text-gray-700">{anomaly.sensorType}</span>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-red-600 font-medium">{anomaly.value}</span>
+                      <div className="text-gray-500">
+                        Normal: {anomaly.normalRange[0]}-{anomaly.normalRange[1]}
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           ))}
@@ -165,13 +200,13 @@ export function AnomalyDetection() {
         {/* Detection Algorithm Info */}
         <div className="mt-3 p-2 bg-blue-50 rounded-lg">
           <div className="flex items-center gap-2 mb-1">
-            <Activity className="w-3 h-3 text-blue-600" />
-            <span className="text-sm font-medium text-blue-800">AI Detection Status</span>
+            <AlertTriangle className="w-3 h-3 text-blue-600" />
+            <span className="text-sm font-medium text-blue-800">Fleet Anomaly Overview</span>
           </div>
           <div className="text-xs text-blue-700">
-            Avg Confidence: {(anomalyStats.avgConfidence * 100).toFixed(0)}% |
+            Total Engines with Anomalies: {engineAnomalies.length} |
             Last Update: 2 min ago |
-            Model: LSTM-AutoEncoder v2.1
+            Detection Model: Sensor Threshold v3.2
           </div>
         </div>
       </CardContent>
