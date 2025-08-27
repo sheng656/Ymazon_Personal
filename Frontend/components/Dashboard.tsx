@@ -38,42 +38,6 @@ const rulDistribution = [
   { range: '>100', count: engines.filter(e => e.rul > 100).length, color: 'bg-green-500' }
 ];
 
-// Operational conditions distribution
-const operationalConditions = [
-  {
-    name: 'Standard Training',
-    description: 'Sea-level single environment operation',
-    count: 178,
-    color: '#3b82f6',
-    emoji: '🌊',
-    riskLevel: 'Low'
-  },
-  {
-    name: 'Full Flight Envelope',
-    description: 'Multi-altitude multi-speed environment',
-    count: 177,
-    color: '#10b981',
-    emoji: '✈️',
-    riskLevel: 'Medium'
-  },
-  {
-    name: 'Complex Training',
-    description: 'Sea-level multi-fault mode',
-    count: 176,
-    color: '#f59e0b',
-    emoji: '⚠️',
-    riskLevel: 'High'
-  },
-  {
-    name: 'Severe Flight Conditions',
-    description: 'Full envelope multi-fault risk',
-    count: 177,
-    color: '#ef4444',
-    emoji: '🚨',
-    riskLevel: 'Critical'
-  }
-];
-
 // Future failure risk prediction data
 const failureRiskData = [
   { period: '0-15 cycles', critical: 63, warning: 25, health: 45, total: 133 },
@@ -97,16 +61,6 @@ export function Dashboard() {
     setSelectedEngine(engineId);
     // Here you could navigate to a detailed engine view or open a modal
     console.log(`Clicked on Engine ${engineId}`);
-  };
-
-  const getRiskColor = (riskLevel: string) => {
-    switch (riskLevel) {
-      case 'Low': return 'text-green-600 bg-green-50';
-      case 'Medium': return 'text-blue-600 bg-blue-50';
-      case 'High': return 'text-yellow-600 bg-yellow-50';
-      case 'Critical': return 'text-red-600 bg-red-50';
-      default: return 'text-gray-600 bg-gray-50';
-    }
   };
 
   return (
@@ -181,12 +135,12 @@ export function Dashboard() {
         </Card>
       </div>
 
-      {/* Main Dashboard Row: Three Column Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {/* Main Dashboard Row: Two Column Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Left - Anomaly Detection */}
         <AnomalyDetection />
 
-        {/* Center - Failure Risk Timeline */}
+        {/* Right - Failure Risk Timeline */}
         <Card>
           <CardHeader>
             <CardTitle>Failure Risk Timeline</CardTitle>
@@ -231,105 +185,6 @@ export function Dashboard() {
                     </div>
                   );
                 })}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        {/* Right - Operational Conditions Monitoring */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Operational Conditions Monitoring</CardTitle>
-            <p className="text-sm text-muted-foreground">
-              Fleet distribution under different operational conditions
-            </p>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {/* Pie chart with SVG */}
-              <div className="flex justify-center mb-4">
-                <svg width="128" height="128" viewBox="0 0 128 128" className="transform -rotate-90">
-                  {operationalConditions.map((condition, index) => {
-                    const total = operationalConditions.reduce((sum, d) => sum + d.count, 0);
-                    const percentage = condition.count / total;
-                    const startAngle = operationalConditions.slice(0, index).reduce((sum, d) => sum + (d.count / total) * 360, 0);
-                    const endAngle = startAngle + (percentage * 360);
-
-                    // Calculate path for pie slice
-                    const centerX = 64;
-                    const centerY = 64;
-                    const radius = 56;
-
-                    const startAngleRad = (startAngle * Math.PI) / 180;
-                    const endAngleRad = (endAngle * Math.PI) / 180;
-
-                    const x1 = centerX + radius * Math.cos(startAngleRad);
-                    const y1 = centerY + radius * Math.sin(startAngleRad);
-                    const x2 = centerX + radius * Math.cos(endAngleRad);
-                    const y2 = centerY + radius * Math.sin(endAngleRad);
-
-                    const largeArcFlag = endAngle - startAngle > 180 ? 1 : 0;
-
-                    const pathData = [
-                      `M ${centerX} ${centerY}`,
-                      `L ${x1} ${y1}`,
-                      `A ${radius} ${radius} 0 ${largeArcFlag} 1 ${x2} ${y2}`,
-                      'Z'
-                    ].join(' ');
-
-                    return (
-                      <path
-                        key={condition.name}
-                        d={pathData}
-                        fill={condition.color}
-                        stroke="white"
-                        strokeWidth="1"
-                      />
-                    );
-                  })}
-                </svg>
-              </div>
-
-              {/* Legend */}
-              <div className="space-y-2">
-                {operationalConditions.map((condition) => (
-                  <div key={condition.name} className="flex items-center justify-between text-xs">
-                    <div className="flex items-center gap-2">
-                      <div
-                        className="w-3 h-3 rounded-full"
-                        style={{ backgroundColor: condition.color }}
-                      />
-                      <span className="font-medium">{condition.emoji} {condition.name}</span>
-                    </div>
-                    <span>{condition.count} engines</span>
-                  </div>
-                ))}
-              </div>
-
-              {/* Detailed description */}
-              <div className="mt-4 space-y-2 text-xs">
-                {operationalConditions.map((condition) => (
-                  <div key={condition.name} className="p-2 rounded border">
-                    <div className="flex items-center justify-between mb-1">
-                      <strong className="flex items-center gap-1">
-                        {condition.emoji} {condition.name}
-                      </strong>
-                      <Badge
-                        variant="outline"
-                        className={getRiskColor(condition.riskLevel)}
-                      >
-                        {condition.riskLevel} Risk
-                      </Badge>
-                    </div>
-                    <p className="text-muted-foreground">{condition.description}</p>
-                  </div>
-                ))}
-              </div>
-
-              <div className="mt-4 p-3 bg-blue-50 rounded-lg">
-                <p className="text-xs text-blue-800">
-                  <strong>Note:</strong> Different operational conditions present varying levels of degradation risk.
-                  Engines operating under severe flight conditions require more frequent monitoring and maintenance.
-                </p>
               </div>
             </div>
           </CardContent>
